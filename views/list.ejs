@@ -1,0 +1,27 @@
+<%- include('header') %>
+
+    <div class="box" id="heading">
+        <h1>Welcome <%= user %>, Today is  <%= date %> </h1>
+        <h1>Your To-Do List For <%= listTitle %></h1>
+    </div>
+    <div class="box" id="heading">
+    </div>
+
+    <div class="box">
+
+        <% for( let i = 0; i < newItemsList.length; i++ ) { %>
+            <div class="item">  
+                <input type="checkbox" >  
+                <p><%= newItemsList[i] %></p>
+            </div>
+        <% } %>
+
+        <form class="item" action="/" method="post">
+            <input type="text" name="newItem" id="" placeholder="New Item" autofocus required>
+            <button type="submit" name="list" value=<%= listTitle %> >+</button>
+        </form>
+        <a href="/work"> to work</a>
+        <a href="/"> to Home</a>
+    </div>
+
+    <%- include('footer') %>
