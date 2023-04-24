@@ -1,59 +1,79 @@
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');   // to receive post requests
 const express = require('express');
-const bodyparser = require('body-parser');
 const app = express()
 const date = require(__dirname + '/date.js')
+
+
+////////////////////////////////////////////////////
+const mongoose = require('mongoose');
+mongoose.connect("mongodb://localhost:27017/todoListDB");             // selection of the db.
+
+const itemsSchema = {
+    name: String
+}
+
+const ToDoItems = mongoose.model("ToDoItem", itemsSchema);           // Model Set Up (Model name should be capitalized.) 
+/////////////////////////////////////////////////////
 
 app.set('view engine', 'ejs');
 
 app.use(express.static("public"))
 app.use(bodyParser.urlencoded({extended:true}));
 
-const items = [];
-const workItems = [];
+
 
 let user = "Sourav";
 
 let day = date.getDate();
+let time = date.getTime();
+
+
+
 
 app.get('/', (req, res) => {
-    console.log(date.getDay())
-    res.render('list', {
-        user: user,
-        date: day,
-        newItemsList: items,
-        listTitle: "Home",
-    });
+
+    ToDoItems.find()
+    .then((items) => {
+        res.render('list', {
+            user: user,
+            date: day,
+            time: time,
+            newItemsList: items,
+            listTitle: "Home",
+        });
+    })
+
 })
+
 
 app.post('/', (req, res) => {
-    let newItem = req.body.newItem;
-
-    if (req.body.list === "Work")  {
-        workItems.push(newItem);
-        res.redirect('/work');
-    } else {
-        items.push(newItem);
-        res.redirect('/');
-    }
-})
-
-app.get('/work', (req, res) => {
-    res.render('list', {
-        listTitle: "Work",
-        newItemsList: workItems,
-        user:user,
-        date: day,
+    
+    let newItem = new ToDoItems({
+        name: req.body.newItem,  
     })
+    newItem.save();
+    res.redirect('/');
 })
 
-app.post('/work', (res, req) => {
-    let item = req.body.newItem;
-    workItems.push(item);
-    res.redirect("/work");
+
+
+
+app.post('/delete', (req, res) => {
+    
+    const checkItemId = req.body.checkbox;
+    ToDoItems.findByIdAndRemove(checkItemId)
+    .then((err) => {
+        console.log(err)
+    })
+    res.redirect('/')
 })
 
-app.get('/about', (req, res) => {
-    res.render('about');
+app.get('/:customListName', (req, res) => {
+    const customListname  =  req.params.customListName;
+    
 })
+
+
 app.listen(3000, () => console.log("Server Started at 3000"));
+
+

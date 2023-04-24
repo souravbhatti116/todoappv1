@@ -23,3 +23,12 @@ exports.getDay = function () {
     let weekday = today.toLocaleDateString('en-US', options)
     return weekday;
 }
+
+exports.getTime = function (){
+    const time = new Date();
+
+    let timeNow  = time.toLocaleTimeString('en-US');
+
+    return timeNow;
+
+}

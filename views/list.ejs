@@ -9,19 +9,20 @@
 
     <div class="box">
 
-        <% for( let i = 0; i < newItemsList.length; i++ ) { %>
+        <% newItemsList.forEach(element => { %>
+            <form action="/delete" method="post">
             <div class="item">  
-                <input type="checkbox" >  
-                <p><%= newItemsList[i] %></p>
+                <input type="checkbox" value="<%=element._id %>" name="checkbox" onchange="this.form.submit()" >  
+                <p><%= element.name %></p>
             </div>
-        <% } %>
+            </form>
+        <% }); %>
+
 
         <form class="item" action="/" method="post">
             <input type="text" name="newItem" id="" placeholder="New Item" autofocus required>
-            <button type="submit" name="list" value=<%= listTitle %> >+</button>
+            <button type="submit" name="list" value=<%= listTitle %> >+</button><br>
         </form>
-        <a href="/work"> to work</a>
-        <a href="/"> to Home</a>
     </div>
 
     <%- include('footer') %>
