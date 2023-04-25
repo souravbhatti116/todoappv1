@@ -4,7 +4,7 @@ const express = require('express');
 const app = express()
 const date = require(__dirname + '/date.js')
 
-
+const port = process.nextTick.PORT || 3000
 ////////////////////////////////////////////////////
 const mongoose = require('mongoose');
 const pass = "Atlas100RavB116"
@@ -26,19 +26,14 @@ const List = mongoose.model('list', listSchema);
 /////////////////////////////////////////////////////
 
 const item1 = new Item({
-    name: "Item1"
+    name: " Sample Task 1"
 })
 const item2 = new Item({
-    name: "Item2"
-})
-const item3 = new Item({
-    name: "Item3"
-})
-const item4 = new Item({
-    name: "Item4"
+    name: "Sample Task 2"
 })
 
-const defaultItems = [item1, item2, item3, item4]
+
+const defaultItems = [item1, item2]
 /////////////////////////////////////////////////////
 app.set('view engine', 'ejs');
 
@@ -154,6 +149,6 @@ app.get('/:customListName', (req, res) => {
 })
 
 
-app.listen(3000, () => console.log("Server Started at 3000"));
+app.listen(port, () => console.log("Server Started at 3000"));
 
 
