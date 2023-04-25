@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const bodyParser = require('body-parser');   // to receive post requests
 const express = require('express');
 const app = express()
@@ -11,10 +12,32 @@ mongoose.connect("mongodb://localhost:27017/todoListDB");             // selecti
 const itemsSchema = {
     name: String
 }
+const Item = mongoose.model("Item", itemsSchema);           // Model Set Up (Model name should be capitalized.) 
 
-const ToDoItems = mongoose.model("ToDoItem", itemsSchema);           // Model Set Up (Model name should be capitalized.) 
+const listSchema = {
+    name: String,
+    items: [itemsSchema], 
+}
+const List = mongoose.model('list', listSchema);
+
+
 /////////////////////////////////////////////////////
 
+const item1 = new Item({
+    name: "Item1"
+})
+const item2 = new Item({
+    name: "Item2"
+})
+const item3 = new Item({
+    name: "Item3"
+})
+const item4 = new Item({
+    name: "Item4"
+})
+
+const defaultItems = [item1, item2, item3, item4]
+/////////////////////////////////////////////////////
 app.set('view engine', 'ejs');
 
 app.use(express.static("public"))
@@ -32,7 +55,7 @@ let time = date.getTime();
 
 app.get('/', (req, res) => {
 
-    ToDoItems.find()
+    Item.find()
     .then((items) => {
         res.render('list', {
             user: user,
@@ -47,30 +70,85 @@ app.get('/', (req, res) => {
 
 
 app.post('/', (req, res) => {
-    
-    let newItem = new ToDoItems({
+
+    const itemName = req.body.newItem;
+    const listName = req.body.listName;
+
+    const item = new Item({
         name: req.body.newItem,  
     })
-    newItem.save();
-    res.redirect('/');
+    
+    if (listName === "Home") {
+        item.save();
+        res.redirect('/');
+    } else {
+        
+        List.findOne({name: listName})
+        .then((foundList) => {
+            foundList.items.push(item);
+            foundList.save();
+            res.redirect('/' + listName );    
+        })
+    }
 })
 
 
 
 
 app.post('/delete', (req, res) => {
-    
+    const listName = req.body.listName
     const checkItemId = req.body.checkbox;
-    ToDoItems.findByIdAndRemove(checkItemId)
-    .then((err) => {
-        console.log(err)
-    })
-    res.redirect('/')
+    if (listName === "Home") {
+
+        Item.findByIdAndRemove(checkItemId)
+        .then((err) => {
+            console.log(err)
+        })
+        res.redirect('/')
+        
+    } else {
+        List.findOneAndUpdate({name:listName}, {$pull: {items: {_id: checkItemId}}} )
+        .then((foundlist) => {
+            res.redirect('/' + listName);
+        })
+    }
+    console.log(listName);
+    console.log(checkItemId);
+
 })
 
 app.get('/:customListName', (req, res) => {
-    const customListname  =  req.params.customListName;
     
+    const customListname  =  _.capitalize(req.params.customListName);
+    
+    List.findOne({name:customListname})
+    .then((foundlist) => {
+        if (!foundlist){
+            console.log("Do not exist")
+            //create a new list.
+            let list = new List({
+                name: customListname,
+                items: defaultItems,
+            })
+            list.save();
+            res.redirect('/' + customListname)
+
+        }else{
+            console.log("Exist")
+            // Show an existing list.
+            res.render('list',{            
+                user: user,
+                date: day,
+                time: time,
+                newItemsList: foundlist.items,
+                listTitle: foundlist.name,
+            } )
+        }
+    })
+    
+    
+    
+
 })
 
 
