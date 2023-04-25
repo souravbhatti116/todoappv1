@@ -7,7 +7,9 @@ const date = require(__dirname + '/date.js')
 
 ////////////////////////////////////////////////////
 const mongoose = require('mongoose');
-mongoose.connect("mongodb://localhost:27017/todoListDB");             // selection of the db.
+const pass = "Atlas100RavB116"
+// mongoose.connect("mongodb://localhost:27017/todoListDB");             // selection of the db.
+mongoose.connect(`mongodb+srv://souravbhatti116:${pass}@mongodbsourav.827m2ne.mongodb.net/?retryWrites=true&w=majority`);             // selection of the db.
 
 const itemsSchema = {
     name: String
